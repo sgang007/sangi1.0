@@ -1,0 +1,6 @@
+/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/CMakeFiles/clean_test_results.dir
+/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/CMakeFiles/doxygen.dir
+/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/gtest/CMakeFiles/gtest.dir
+/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/gtest/CMakeFiles/gtest_main.dir
+/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/CMakeFiles/run_tests.dir
+/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/CMakeFiles/tests.dir

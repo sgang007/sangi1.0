@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/devel -DCMAKE_INSTALL_PREFIX=/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/install -G Unix Makefiles
