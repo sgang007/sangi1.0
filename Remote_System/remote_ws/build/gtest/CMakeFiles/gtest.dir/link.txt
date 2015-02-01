@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC    -shared -Wl,-soname,libgtest.so -o libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o  -L/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/gtest/src -lpthread -Wl,-rpath,/home/shubo/Desktop/Blind_Localization/sangi1.0/Remote_System/remote_ws/build/gtest/src 
