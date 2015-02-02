@@ -10,5 +10,5 @@
 		<arg name="gui" value="true"/>	  
 	</include>	
 	<!-- ros_control sangi launch file -->
-<!--  	<include file="$(find sangi_control)/launch/sangi_control.launch" /> 
- --></launch>
+ 	<include file="$(find sangi_control)/launch/sangi_control.launch" /> 
+</launch>
