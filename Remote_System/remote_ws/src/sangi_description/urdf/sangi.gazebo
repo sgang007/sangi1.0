@@ -4,15 +4,15 @@
 	  <material>Gazebo/Orange</material>
 	</gazebo>
 	<gazebo reference="caster_wheel">
-  	  <mu1>0.1</mu1>
-      <mu2>0.1</mu2>
+  	  <mu1>0.0</mu1>
+      <mu2>0.0</mu2>
   	  <material>Gazebo/Red</material>
 	</gazebo>
 	<gazebo>
 	
-  	  <!-- <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+  	  <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
     	<robotNamespace>/sangi</robotNamespace>
-  	  </plugin> -->
+  	  </plugin>
 	
 	<plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">  
 		<robotNamespace>/sangi</robotNamespace>
@@ -21,7 +21,7 @@
 		<alwaysOn>true</alwaysOn>
     </plugin>
 </gazebo>
-<!-- 	<gazebo>
+	<gazebo>
 	  <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
 	  	<robotNamespace>/sangi</robotNamespace>
 		<alwaysOn>true</alwaysOn>
@@ -52,5 +52,5 @@
       <bodyName>chassis</bodyName>
       <xyzOffset>0 0 0</xyzOffset>
       <rpyOffset>0 0 0</rpyOffset>
- 	</plugin> -->
+ 	</plugin>
 </robot>
