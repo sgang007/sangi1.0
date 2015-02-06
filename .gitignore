@@ -1,0 +1,6 @@
+bin
+devel
+build
+_site
+generated*
+*~
