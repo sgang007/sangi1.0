@@ -9,4 +9,4 @@ The following tasks are done using the Arduino UNO R3 base:
 
 - [ ] PID Loop to control motion of motors using encoders
 
-- [ ] Sending I2C data containing array of estimated obstacles and their distances in a full 360 degree scan is send to Raspberry Pi
+- [ ] Sending Serial data containing array of estimated obstacles and their distances in a full 360 degree scan is send to Raspberry Pi
