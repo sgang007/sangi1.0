@@ -20,7 +20,7 @@
     <header>
       <div class="inner">
         <h1>Sangi1.0</h1>
-        <h2>Sangi is a low cost autonomous robot which uses Ultrasonic sensors to perform localization and mapping of the environement</h2>
+        <h2>Sangi is a low cost blind robot which uses minimum possible sensors to perform localization and mapping of the environment</h2>
         <a href="https://github.com/sgang007/sangi1.0" class="button"><small>View project on</small> GitHub</a>
       </div>
     </header>
@@ -33,18 +33,27 @@
 
 <p>Have you ever searched for something in the dark. Have you ever wondered how a blind man moves around in the world. We are building a robot to do just that. Sangi is a Sanskrit word which means a friend, follower and a companion. Our robot Sangi1.0 will navigate around the house blindly and do a variety of tasks.</p>
 
-<!-- <pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
- -->
+
 <p>Our project is build primarily for the purpose of producing a research paper but later we if everything permits, we might go and market our product also.</p>
 
+<h3>
+<a id="technical-details" class="anchor" href="#techincal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overall Structure</h3>
+<p>Sangi uses a variational approximation with Bayesian Inference to estimate its position in the environment. The likelihood estimation is done using EM algorithm on a Gaussian Scale Mixture. Mapping of the environment is done using an incremental mapping algorithm whose efficiency is increased using a kNN based classification technique.</p>
+<p>The lower level algorithms include an EKF to estimate the odometry data from the wheel encoders. The control is achieved using a fuzzy calibrated PID control loop which maintains linear and rotational velocity of the robot. Sonar profiling is done using an ANOVA regression method to give a normal belief of obstacle.</p>
+<p>Hardware used in the project are Raspberry Pi to run the higher level algorithms, Arduino UNO for lower level control, a Remote System for fault diagnosis,a Parallax Ping Sensor and motors with encoder attached.</p>
 <h3>
 <a id="work-with-us" class="anchor" href="#work-with-us" aria-hidden="true"><span class="octicon octicon-link"></span></a>Work with us</h3>
 
 <p>If you want to work with us in this project, send us a message along with your CV at <a href="http://facebook.com/narm.robotics">NARM Robotics</a>. After evaluating your skills, you will be given access to your cloud and our private repository. You will also be given a set of tasks within a deadline and you can work from anywhere.</p>
-
+<p> After you get access to our repository, you can either clone it from github desktop application in Windows or type these commands if you are using Linux
+<pre><code>$ git clone https://sgang007.github.io/sangi1.0
+$ git config --global user.name "Your Name"
+$ git config --global user.email your_email@mailhost.com
+$ git config --global credential.helper cache
+$ git config --global credential.helper "cache --timeout=3600"
+$ git checkout <branch-name>
+</code></pre> 
+</p>
 <h3>
 <a id="sponsor Us" class="anchor" href="#sponsor Us" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sponsor Us?</h3>
 
