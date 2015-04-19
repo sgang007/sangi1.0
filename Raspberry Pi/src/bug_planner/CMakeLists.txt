@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   roscpp
   rospy
+  pluginlib
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -85,9 +87,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES bug_planner
-  CATKIN_DEPENDS angles costmap_2d geometry_msgs nav_core nav_msgs roscpp rospy
-  DEPENDS system_lib
+  LIBRARIES bug_planner_lib
+  CATKIN_DEPENDS angles costmap_2d geometry_msgs nav_core nav_msgs roscpp rospy pluginlib tf
+  #DEPENDS system_lib
 )
 
 ###########
@@ -98,6 +100,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+	include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -111,12 +114,12 @@ include_directories(
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(bug_planner_node bug_planner_generate_messages_cpp)
+add_dependencies(bug_planner_lib ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(bug_planner_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(bug_planner_lib
+   ${catkin_LIBRARIES}
+ )
 
 #############
 ## Install ##
@@ -133,25 +136,26 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS bug_planner bug_planner_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+ install(TARGETS bug_planner_lib
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+ install(DIRECTORY include/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
-# )
+ )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
+install(FILES
+	global_planner_plugin.xml
 #   # myfile1
 #   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+ )
 
 #############
 ## Testing ##
