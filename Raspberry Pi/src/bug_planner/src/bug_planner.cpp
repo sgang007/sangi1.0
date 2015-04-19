@@ -19,7 +19,20 @@
  
  
  void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros){
-   
+    if(!initialized_){
+       costmap_ros_ = costmap_ros; //initialize the costmap_ros_ attribute to the parameter. 
+       costmap_ = costmap_ros_->getCostmap(); //get the costmap_ from costmap_ros_
+ 
+      // initialize other planner parameters
+       ros::NodeHandle private_nh("~/" + name);
+       private_nh.param("step_size", step_size_, costmap_->getResolution());
+       private_nh.param("min_dist_from_robot", min_dist_from_robot_, 0.10);
+       world_model_ = new base_local_planner::CostmapModel(*costmap_); 
+ 
+       initialized_ = true;
+     }
+     else
+       ROS_WARN("This planner has already been initialized... doing nothing");
  }
  
  bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,  std::vector<geometry_msgs::PoseStamped>& plan ){
