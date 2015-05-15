@@ -1,8 +1,10 @@
 1. Install Gazebo and necessary dependencies
-2. cd remote_ws
-3. catkin_make
-4. source devel/setup.bash
-5. rospack profile
+	> libgazebo_ros_control plugin
+	> ros controller-manager
+2. `cd remote_ws`
+3. `catkin_make`
+4. `source devel/setup.bash`
+5. `rospack profile`
 
 Launch the empty world and control the robot
 ---------------------------------------------
