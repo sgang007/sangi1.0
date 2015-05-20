@@ -48,10 +48,10 @@
       <box_inertia m="${chassisMass}" x="${chassisLength}" y="${chassisWidth}" z="${chassisHeight}" />
     </inertial>
    </link>
-    <joint name="fixed" type="fixed">
-  <parent link="chassis"/>
-  <child link="caster_wheel"/>
-</joint>
+	<joint name="fixed" type="fixed">
+	  	<parent link="chassis"/>
+	  	<child link="caster_wheel"/>
+	</joint>
 
 <link name="caster_wheel">
   <collision>
@@ -77,4 +77,7 @@
 </link>
 <wheel lr="left" tY="1"/>
 <wheel lr="right" tY="-1"/>
+<sonar_sensor name="sonar1" parent="chassis" ros_topic="sonar1" origin_new="${chassisLength/2} 0 ${chassisHeight}" update_rate="10" min_range="1" max_range="10" field_of_view="3.14" ray_count="1"/>
+<sonar_sensor name="sonar2" parent="chassis" ros_topic="sonar2" origin_new="${chassisLength/2} ${chassisWidth/2} ${chassisHeight}" update_rate="10" min_range="1" max_range="10" field_of_view="3.14" ray_count="1"/>
+<sonar_sensor name="sonar3" parent="chassis" ros_topic="sonar3" origin_new="${chassisLength/2} -${chassisWidth/2} ${chassisHeight}" update_rate="10" min_range="1" max_range="10" field_of_view="3.14" ray_count="1"/>
 </robot>
