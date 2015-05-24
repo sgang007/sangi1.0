@@ -151,7 +151,7 @@ add_dependencies(bug_planner_lib ${PROJECT_NAME}_gencfg)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-	global_planner_plugin.xml
+	bug_planner_plugin.xml
 #   # myfile1
 #   # myfile2
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}

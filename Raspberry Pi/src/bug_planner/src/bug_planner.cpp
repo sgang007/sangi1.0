@@ -1,24 +1,24 @@
  #include <pluginlib/class_list_macros.h>
- #include "bug_planner.h"
+ #include <bug_planner.h>
  
  //register this planner as a BaseGlobalPlanner plugin
- PLUGINLIB_EXPORT_CLASS(global_planner::GlobalPlanner, nav_core::BaseGlobalPlanner)
+ PLUGINLIB_EXPORT_CLASS(global_planner::BugPlanner, nav_core::BaseGlobalPlanner)
  
  using namespace std;
  
  //Default Constructor
  namespace global_planner {
  
- GlobalPlanner::GlobalPlanner (){
+ BugPlanner::BugPlanner (){
  
  }
 
- GlobalPlanner::GlobalPlanner(std::string name, costmap_2d::Costmap2DROS* costmap_ros){
+ BugPlanner::BugPlanner(std::string name, costmap_2d::Costmap2DROS* costmap_ros){
    initialize(name, costmap_ros);
  }
  
  
- void GlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros){
+ void BugPlanner::initialize(std::string name, costmap_2d::Costmap2DROS* costmap_ros){
     if(!initialized_){
        costmap_ros_ = costmap_ros; //initialize the costmap_ros_ attribute to the parameter. 
        costmap_ = costmap_ros_->getCostmap(); //get the costmap_ from costmap_ros_
@@ -35,7 +35,7 @@
        ROS_WARN("This planner has already been initialized... doing nothing");
  }
  
- bool GlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,  std::vector<geometry_msgs::PoseStamped>& plan ){
+ bool BugPlanner::makePlan(const geometry_msgs::PoseStamped& start, const geometry_msgs::PoseStamped& goal,  std::vector<geometry_msgs::PoseStamped>& plan ){
    
     plan.push_back(start);
    for (int i=0; i<20; i++){
