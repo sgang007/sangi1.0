@@ -92,7 +92,7 @@
         <origin xyz="${origin_new}" rpy="${rpy}" />
         <geometry>
           <!--<box size="0.01 0.01 0.01" /> -->
-          <mesh filename="package://hector_sensors_description/meshes/sonar_sensor/max_sonar_ez4.dae"/>
+          <mesh filename="package://sangi_description/meshes/sonar/ping_sonar.dae"/>
         </geometry>
       </visual>
       <collision>
