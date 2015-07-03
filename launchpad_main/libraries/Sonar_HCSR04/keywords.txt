@@ -1,0 +1,5 @@
+sr04_sonar	KEYWORD1
+init	KEYWORD2
+apply_filter	KEYWORD2
+get_distance_cm	KEYWORD2
+get_distance_inches	KEYWORD2

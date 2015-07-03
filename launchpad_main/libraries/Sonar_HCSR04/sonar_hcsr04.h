@@ -10,13 +10,14 @@ class sr04_sonar
 		sr04_sonar();
 		sr04_sonar(int echo,int trigger);
 		void init();
-		float apply_filter(int dist);
-		int get_distance_cm();
-		int get_distance_inches();
+		float apply_filter(long dist);
+		long get_distance_cm();
+		long get_distance_inches();
 
 	private:
-		const int echo_pin;
-		const int trig_pin;
+		int echo_pin;
+		int trig_pin;
+		long get_duration();
 }
 
 #endif
