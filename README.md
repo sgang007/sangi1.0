@@ -5,7 +5,7 @@ Sangi is a low cost autonomous robot which used Ultrasonic sensors to perform lo
 
 Speech plugin of sangi
 
-- [ ] Create Android app which uses google speech API and recognizes text.
+- [x] Create Android app which uses google speech API and recognizes text.
 
 - [ ] Create an ICE client and server.
 
