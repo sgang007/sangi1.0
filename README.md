@@ -7,6 +7,8 @@ Speech plugin of sangi
 
 - [x] Create Android app which uses google speech API and recognizes text.
 
+- [x] Send text via bluetooth in form of txt file.
+
 - [ ] Create an ICE client and server.
 
 - [ ] Create a remote PC app to get data from Android app over wifi.
