@@ -3,10 +3,10 @@ sangi1.0
 
 Sangi is a low cost autonomous robot which used Ultrasonic sensors to perform localization and mapping of the environement
 
-<i>See the folder references for the research papers referenced in the project.</i>
+Speech plugin of sangi
 
-- [ ] Hardware implementation using Arduino and Raspberry Pi.
+- [ ] Create Android app which uses google speech API and recognizes text.
 
-- [ ] Mapping using Bayesian Model in an iconic algorithm.
+- [ ] Create an ICE client and server.
 
-- [ ] Localization.
+- [ ] Create a remote PC app to get data from Android app over wifi.
