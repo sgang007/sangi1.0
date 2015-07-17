@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SangiCommands</string>
+    <string name="Heading">Recognized Text</string>
+    <string name="action_settings">Settings</string>
+    <string name="Record">Start</string>
+    <string name="sendData">Send Command</string>
+
+</resources>
