@@ -1,10 +1,19 @@
 package com.sangi.sangicommands;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.RecognizerIntent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 
 
@@ -19,8 +29,11 @@ import android.widget.EditText;
 public class MainActivity extends Activity implements OnClickListener{
 
 	private Button recordButton;
+	private Button bluetoothButton;
 	private EditText translatedText;
 	private static final int REQUEST_CODE = 1234;
+	private static final int DISCOVER_DURATION = 300;
+	private static final int REQUEST_BLU = 1;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +43,11 @@ public class MainActivity extends Activity implements OnClickListener{
         //Assign the views to objects
         recordButton = (Button) findViewById(R.id.speechStart);
         translatedText = (EditText) findViewById(R.id.translatedText);
+        bluetoothButton = (Button) findViewById(R.id.sendDataBluetooth);
         
         //Set listener
         recordButton.setOnClickListener(this);
+        bluetoothButton.setOnClickListener(this);
     }
 
 
@@ -62,7 +77,10 @@ public class MainActivity extends Activity implements OnClickListener{
 		{
 			startVoiceRecognitionActivity();
 		}
-		
+		if(bluetoothButton.isPressed())
+		{
+			sendViaBluetooth();
+		}
 	}
 	
 	 public void startVoiceRecognitionActivity() {
@@ -76,12 +94,85 @@ public class MainActivity extends Activity implements OnClickListener{
 	 }
 	    
 	 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		    if (requestCode == REQUEST_CODE && resultCode== -1) {
+		 if(resultCode == DISCOVER_DURATION && requestCode == REQUEST_BLU) {
+	    		
+	    		Intent intent = new Intent();
+	    		intent.setAction(Intent.ACTION_SEND);
+	    		intent.setType("text/plain");
+	    		File sdcard = Environment.getExternalStorageDirectory();
+	    		//Get the text file
+	    		File file = new File(sdcard,"Commands.txt");
+	    		FileOutputStream fos;
+	            try {
+	            	fos = new FileOutputStream(file);
+					fos.write(translatedText.getText().toString().getBytes());
+					fos.flush();
+		            fos.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	            
+	    		intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+	    		
+	    		PackageManager pm = getPackageManager();
+	    		List<ResolveInfo> appsList = pm.queryIntentActivities(intent, 0);
+	    		
+	    		if(appsList.size() > 0) {
+	    			String packageName = null;
+	    			String className = null;
+	    			boolean found = false;
+	    			
+	    			for(ResolveInfo info : appsList) {
+	    				packageName = info.activityInfo.packageName;
+	    				if(packageName.equals("com.android.bluetooth")) {
+	    					className = info.activityInfo.name;
+	    					found = true;
+	    					break;
+	    				}
+	    			}
+	    			
+					if (!found) {
+						Toast.makeText(this, "Bluetooth havn't been found",
+								Toast.LENGTH_LONG).show();
+					} else {
+						intent.setClassName(packageName, className);
+						startActivity(intent);
+					}
+	    		}
+			} else {
+				Toast.makeText(this, "Bluetooth is cancelled", Toast.LENGTH_LONG)
+						.show();
+			}
+		 
+		 
+		 if (requestCode == REQUEST_CODE && resultCode== -1) {
 		      ArrayList matches = data
 		          .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 		      translatedText.setText((String) matches.get(0));
 		    }
 		    super.onActivityResult(requestCode, resultCode, data);
+		    
+		    
 	 }
+	 
+	 public void sendViaBluetooth(){
+		 	BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+	    	
+	    	if(btAdapter == null) {
+	    		Toast.makeText(this, "Bluetooth is not supported on this device", Toast.LENGTH_LONG).show();
+	    	} else {
+	    		enableBluetooth();
+	    	}
+	 }
+	 
+	 public void enableBluetooth() {
+	    	
+	    	Intent discoveryIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+	    	
+	    	discoveryIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, DISCOVER_DURATION);
+	    	
+	    	startActivityForResult(discoveryIntent, REQUEST_BLU);
+	    }
 }
 

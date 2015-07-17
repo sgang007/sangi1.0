@@ -30,7 +30,7 @@
 	     android:textSize="12sp" />
 	 
 	  <Button
-	     android:id="@+id/sendData"
+	     android:id="@+id/sendDataBluetooth"
 	     android:layout_width="wrap_content"
 	     android:layout_height="wrap_content"
 	     android:layout_below="@id/speechStart"

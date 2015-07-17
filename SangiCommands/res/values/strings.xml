@@ -5,6 +5,6 @@
     <string name="Heading">Recognized Text</string>
     <string name="action_settings">Settings</string>
     <string name="Record">Start</string>
-    <string name="sendData">Send Command</string>
+    <string name="sendData">Send commands via Bluetooth</string>
 
 </resources>
