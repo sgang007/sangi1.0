@@ -23,16 +23,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
-
-
 public class MainActivity extends Activity implements OnClickListener{
 
 	private Button recordButton;
 	private Button bluetoothButton;
+	private Button wifiButton;
+	private Button stemmerTest;
 	private EditText translatedText;
+	
+	//Just a code required for onActivityResult
 	private static final int REQUEST_CODE = 1234;
+	//Starts the bluetooth and makes device available for the DISCOVER_DURATION
 	private static final int DISCOVER_DURATION = 300;
+	
 	private static final int REQUEST_BLU = 1;
 	
     @Override
@@ -44,10 +47,14 @@ public class MainActivity extends Activity implements OnClickListener{
         recordButton = (Button) findViewById(R.id.speechStart);
         translatedText = (EditText) findViewById(R.id.translatedText);
         bluetoothButton = (Button) findViewById(R.id.sendDataBluetooth);
+        wifiButton = (Button) findViewById(R.id.sendDataIce);
+        stemmerTest = (Button) findViewById(R.id.stemmerTest);
         
-        //Set listener
+        //Set listeners
         recordButton.setOnClickListener(this);
         bluetoothButton.setOnClickListener(this);
+        wifiButton.setOnClickListener(this);
+        stemmerTest.setOnClickListener(this);
     }
 
 
@@ -81,6 +88,42 @@ public class MainActivity extends Activity implements OnClickListener{
 		{
 			sendViaBluetooth();
 		}
+		if(wifiButton.isPressed())
+		{
+			sendViaWifi();
+		}
+		if(stemmerTest.isPressed())
+		{
+			performStemming();
+		}
+	}
+	
+	public void performStemming(){
+		englishStemmer stemmer= new englishStemmer();
+		//Sets the text for stemming
+		String textToStem = translatedText.getText().toString();
+		String[] split = textToStem.split("\\s+"); 
+		for(int i = 0; i<split.length;i++){
+			//Set the text to stem
+			stemmer.setCurrent(split[i]);
+			//Stems the text
+			stemmer.stem();
+			split[i]=stemmer.getCurrent();
+		}
+		String stemmedText=split[0];
+		
+		for(int i = 1; i<split.length; i++){
+			stemmedText = stemmedText +" "+split[i];
+		}
+		//Return Stemmed Text
+		translatedText.setText(stemmedText);
+	}
+	
+	public void sendViaWifi(){
+		//Send data over the wifi
+		
+		
+		
 	}
 	
 	 public void startVoiceRecognitionActivity() {
@@ -109,7 +152,6 @@ public class MainActivity extends Activity implements OnClickListener{
 					fos.flush();
 		            fos.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	            
@@ -140,11 +182,7 @@ public class MainActivity extends Activity implements OnClickListener{
 						startActivity(intent);
 					}
 	    		}
-			} else {
-				Toast.makeText(this, "Bluetooth is cancelled", Toast.LENGTH_LONG)
-						.show();
-			}
-		 
+			} 
 		 
 		 if (requestCode == REQUEST_CODE && resultCode== -1) {
 		      ArrayList matches = data

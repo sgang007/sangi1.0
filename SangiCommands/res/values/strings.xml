@@ -6,5 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="Record">Start</string>
     <string name="sendData">Send commands via Bluetooth</string>
+    <string name="sendDataIce">Send Data over wifi</string>
+    <string name="stemmerTest">Test Stemmer</string>
 
 </resources>

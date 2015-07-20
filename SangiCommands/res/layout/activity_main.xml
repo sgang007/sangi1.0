@@ -37,5 +37,22 @@
 	     android:layout_marginTop="20sp"
 	     android:text="@string/sendData"
 	     android:textSize="12sp" />
+	  
+	  <Button
+	     android:id="@+id/sendDataIce"
+	     android:layout_width="wrap_content"
+	     android:layout_height="wrap_content"
+	     android:layout_below="@id/sendDataBluetooth"
+	     android:layout_marginTop="20sp"
+	     android:text="@string/sendDataIce"
+	     android:textSize="12sp" />
+	  <Button
+	     android:id="@+id/stemmerTest"
+	     android:layout_width="wrap_content"
+	     android:layout_height="wrap_content"
+	     android:layout_below="@id/sendDataIce"
+	     android:layout_marginTop="20sp"
+	     android:text="@string/stemmerTest"
+	     android:textSize="12sp" />
 
 </RelativeLayout>
