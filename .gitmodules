@@ -1,3 +1,6 @@
 [submodule "Raspberry Pi/PiCam_server"]
 	path = Raspberry Pi/PiCam_server
 	url = https://github.com/silvanmelchior/RPi_Cam_Web_Interface
+[submodule "Raspberry Pi/VR_server"]
+	path = Raspberry Pi/VR_server
+	url = https://github.com/patcat/PiViewer
