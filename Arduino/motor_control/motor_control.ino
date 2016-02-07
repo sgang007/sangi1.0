@@ -1,147 +1,97 @@
-// Test MD03a / Pololu motor with encoder
-// speed control (PI), V & I display
-// Credits:
-//   Dallaby   http://letsmakerobots.com/node/19558#comment-49685
-//   Bill Porter  http://www.billporter.info/?p=286
-//   bobbyorr (nice connection diagram) http://forum.pololu.com/viewtopic.php?f=15&t=1923
+
+//#define ENCODER_OPTIMIZE_INTERRUPTS
+#include <Encoder.h>
+#include <DualVNH5019MotorShield.h>
+
+#define COUNTS_PER_REV 1200*2 
+//As per Pololu website 1200 ticks is to one revolution of motor shaft but experiments shows 2400
+
+//Left Motor Pin Definitions
+
+#define ENDIAG1     1 
+#define InA1        8
+#define InB1        7
+#define PWM1        9
+#define CS1         A0
+#define encA1       5
+#define encB1       3
+
+//Right Motor Pin Definitions
+
+#define ENDIAG2     6
+#define InA2        11
+#define InB2        12
+#define PWM2        10
+#define CS2         A1
+#define encA2       4
+#define encB2       2
 
 
-#define InA1            10                      // INA motor pin
-#define InB1            11                      // INB motor pin 
-#define PWM1            6                       // PWM motor pin
-#define encodPinA1      3                       // encoder A pin
-#define encodPinB1      8                       // encoder B pin
-#define Apin            1                       // motor current monitoring analog pin
-
-#define CURRENT_LIMIT   1000                     // high current warning
-#define LOW_BAT         10000                   // low bat warning
-#define LOOPTIME        100                     // PID loop time
-#define NUMREADINGS     10                      // samples for Amp average
-
-int readings[NUMREADINGS];
-unsigned long lastMilli = 0;                    // loop timing 
-unsigned long lastMilliPrint = 0;               // loop timing
-int speed_req = 300;                            // speed (Set Point)
-int speed_act = 0;                              // speed (actual value)
-int PWM_val = 0;                                // (25% = 64; 50% = 127; 75% = 191; 100% = 255)
-int voltage = 0;                                // in mV
-int current = 0;                                // in mA
-volatile long count = 0;                        // rev counter
-float Kp =   .4;                                // PID proportional control Gain
-float Kd =    1;                                // PID Derivitave control gain
-
+DualVNH5019MotorShield md(InA1,InB1,ENDIAG1,CS1,InA2,InB2,ENDIAG2,CS2);
+Encoder en1(encA1,encB1);
+Encoder en2(encA2,encB2);
+int enc1_rpm,enc2_rpm;
 
 void setup() {
- analogReference(EXTERNAL);                            // Current external ref is 3.3V
- Serial.begin(115600);
- pinMode(InA1, OUTPUT);
- pinMode(InB1, OUTPUT);
- pinMode(PWM1, OUTPUT);
- pinMode(encodPinA1, INPUT); 
- pinMode(encodPinB1, INPUT); 
- digitalWrite(encodPinA1, HIGH);                      // turn on pullup resistor
- digitalWrite(encodPinB1, HIGH);
- attachInterrupt(1, rencoder, FALLING);
- for(int i=0; i<NUMREADINGS; i++)   readings[i] = 0;  // initialize readings to 0
+    md.init();
+  
+    Serial.begin(115200);
+    Serial.println("Motor Driver and Encoder Test \n --------------------------");
 
- analogWrite(PWM1, PWM_val);
- digitalWrite(InA1, LOW);
- digitalWrite(InB1, HIGH);
+}
+void stopIfFault()
+{
+  if (md.getM1Fault())
+  {
+    Serial.println("M1 fault");
+    while(1);
+  }
+  if (md.getM2Fault())
+  {
+    Serial.println("M2 fault");
+    while(1);
+  }
 }
 
 void loop() {
- getParam();                                                                 // check keyboard
- if((millis()-lastMilli) >= LOOPTIME)   {                                    // enter tmed loop
-   lastMilli = millis();
-   getMotorData();                                                           // calculate speed, volts and Amps
-   PWM_val= updatePid(PWM_val, speed_req, speed_act);                        // compute PWM value
-   analogWrite(PWM1, PWM_val);                                               // send PWM to motor
- }
- printMotorInfo();                                                           // display data
-}
+  // put your main code here, to run repeatedly:
 
-void getMotorData()  {                                                        // calculate speed, volts and Amps
-static long countAnt = 0;                                                   // last count
- speed_act = ((count - countAnt)*(60*(1000/LOOPTIME)))/(16*29);          // 16 pulses X 29 gear ratio = 464 counts per output shaft rev
- countAnt = count;                  
- current = int(analogRead(Apin) * 3.22 * .77 *(1000.0/132.0));               // motor current - output: 130mV per Amp
- current = digital_smooth(current, readings);                                // remove signal noise
-}
+      md.setSpeeds(200,10);
+  
+  if (en1.read()>COUNTS_PER_REV|| en1.read()<-COUNTS_PER_REV)
+  {
+    //1 Revoultion complete
+    enc1_rpm++;
+    Serial.print("Left Motor(Revs): ");
+    Serial.print(enc1_rpm);
+    
+    if (en1.read()<0)
+    Serial.print(" anti-clockwise");
+    else
+    Serial.print("clockwise");
+    
+    en1.write(0);
+    
+    Serial.println();
+  }
+  
+  
+  if (en2.read()>COUNTS_PER_REV|| en2.read()<-COUNTS_PER_REV)
+  {
+    //1 Revoultion complete
+    enc2_rpm++;
+    Serial.print("\t Right Motor(Revs): ");
+    Serial.print(enc2_rpm);
+    
+    if (en2.read()<0)
+    Serial.print(" anti-clockwise");
+    else
+    Serial.print("clockwise");
+    
+    en2.write(0);
+    
+    Serial.println();
+  }  
+  
 
-int updatePid(int command, int targetValue, int currentValue)   {             // compute PWM value
-float pidTerm = 0;                                                            // PID correction
-int error=0;                                  
-static int last_error=0;                             
- error = abs(targetValue) - abs(currentValue); 
- pidTerm = (Kp * error) + (Kd * (error - last_error));                            
- last_error = error;
- return constrain(command + int(pidTerm), 0, 255);
-}
-
-void printMotorInfo()  {                                                      // display data
- if((millis()-lastMilliPrint) >= 500)   {                     
-   lastMilliPrint = millis();
-   Serial.print("SP:");             Serial.print(speed_req);  
-   Serial.print("  RPM:");          Serial.print(speed_act);
-   Serial.print("  PWM:");          Serial.print(PWM_val);  
-   Serial.print("  mA:");           Serial.println(current);
-
-   if (current > CURRENT_LIMIT)               Serial.println("*** CURRENT_LIMIT ***");                
- }
-}
-
-void rencoder()  {                                    // pulse and direction, direct port reading to save cycles
- if (PINB & 0b00000001)    count++;                // if(digitalRead(encodPinB1)==HIGH)   count ++;
- else                      count--;                // if (digitalRead(encodPinB1)==LOW)   count --;
-}
-
-int getParam()  {
-char param, cmd;
- if(!Serial.available())    return 0;
- delay(10);                  
- param = Serial.read();                              // get parameter byte
- if(!Serial.available())    return 0;
- cmd = Serial.read();                                // get command byte
- Serial.flush();
- switch (param) {
-   case 'v':                                         // adjust speed
-     if(cmd=='+')  {
-       speed_req += 20;
-       if(speed_req>400)   speed_req=400;
-     }
-     if(cmd=='-')    {
-       speed_req -= 20;
-       if(speed_req<0)   speed_req=0;
-     }
-     break;
-   case 's':                                        // adjust direction
-     if(cmd=='+'){
-       digitalWrite(InA1, LOW);
-       digitalWrite(InB1, HIGH);
-     }
-     if(cmd=='-')   {
-       digitalWrite(InA1, HIGH);
-       digitalWrite(InB1, LOW);
-     }
-     break;
-   case 'o':                                        // user should type "oo"
-     digitalWrite(InA1, LOW);
-     digitalWrite(InB1, LOW);
-     speed_req = 0;
-     break;
-   default: 
-     Serial.println("???");
-   }
-}
-
-int digital_smooth(int value, int *data_array)  {    // remove signal noise
-static int ndx=0;                                                         
-static int count=0;                          
-static int total=0;                          
- total -= data_array[ndx];               
- data_array[ndx] = value;                
- total += data_array[ndx];               
- ndx = (ndx+1) % NUMREADINGS;                                
- if(count < NUMREADINGS)      count++;
- return total/count;
 }
