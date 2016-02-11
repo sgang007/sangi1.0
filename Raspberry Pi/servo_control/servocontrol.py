@@ -1,10 +1,12 @@
-import serial
+import webiopi
+from webiopi.devices.serial import Serial
 import time
 
+
 class ServoController:
-    def __init__(self):
-        serPort = '/dev/ttyAMA0'
-        self.sc = serial.Serial(serPort, timeout=1)
+    def __init__(self, port, BAUD_RATE):
+        serPort = port
+        self.sc = Serial(serPort, BAUD_RATE)
 
     def closeServo(self):
         self.sc.close()
@@ -43,7 +45,7 @@ class ServoController:
         data =  chr(0xaa) + chr(0x0c) + chr(0x27) + chr(0)
         self.sc.write(data)
 
-servo1=ServoController()
-servo1.setAngle(1,90)
-servo1.setPosition(0,90)
+# servo1=ServoController()
+# servo1.setAngle(1,10)
+# servo1.setPosition(0,90)
 #servo1.setAngle(0,90)
