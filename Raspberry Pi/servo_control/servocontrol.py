@@ -38,7 +38,7 @@ class ServoController:
     
     def setSpeed(self,servo,speed):
         #speed is accepted in microseconds/milliseconds. See pg 42 of documentation
-        speed = speed/0.025
+        speed = speed / 0.025
         speed_low = (speed & 0x7f)
         speed_high = (speed >> 7)& 0x7f
         chan = servo & 0x7f
@@ -47,6 +47,29 @@ class ServoController:
             data =  chr(0xaa) + chr(0x0c) + chr(0x07) + chr(chan) + chr(speed_low) + chr(speed_high)
         else:
             data = chr(0x87) + chr(chan) + chr(speed_low) + chr(speed_high)
+        self.sc.write(data)
+
+    def setAcceleration(self,servo,acc):
+        #acceleration setting in microseconds/(milliseconds)^2
+        #range of acc: 0 - 0.08 , if given less than 0.08
+        #            : 0 - 255, if more than 0.08
+        if acc < 0.08:
+            acc = acc / 0.025 / 80
+        else:
+            acc = int(acc)
+        
+        if acc < 0:
+            acc = 0
+        elif acc > 255:
+            acc = 255
+
+        acc_low = (acc & 0x7f)
+        acc_high = (acc >> 7) & 0x7f
+
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x09) + chr(chan) + chr(acc_low) + chr(acc_high)
+        else:
+            data = chr(0x89) + chr(chan) + chr(acc_low) + chr(acc_high)
         self.sc.write(data)
 
 
