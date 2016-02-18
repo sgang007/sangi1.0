@@ -13,6 +13,15 @@ class ServoController:
         self.sc.close()
 
     
+    def home(self):
+        #send servo to defult positions
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x22)
+        else:
+            data = chr(0xa2) 
+        self.sc.write(data)
+        
+
     def setAngle(self, n, angle):
         #setAngle is setTarget is miniSSC protocol
         if angle > 180 or angle <0:
