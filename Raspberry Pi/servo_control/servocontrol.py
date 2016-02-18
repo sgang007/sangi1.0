@@ -65,12 +65,25 @@ class ServoController:
 
         acc_low = (acc & 0x7f)
         acc_high = (acc >> 7) & 0x7f
+        chan = servo & 0x7f
 
         if self.protocol=="pololu":
             data =  chr(0xaa) + chr(0x0c) + chr(0x09) + chr(chan) + chr(acc_low) + chr(acc_high)
         else:
             data = chr(0x89) + chr(chan) + chr(acc_low) + chr(acc_high)
         self.sc.write(data)
+
+
+    def get_movingState(self):
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x13)
+        else:
+            data = chr(0x93) 
+        self.sc.write(data)
+        if ord(self.sc.read()) == 0:
+            return False #not moving
+        else:
+            return True #servos are moving
 
 
     def getPosition(self, servo):
@@ -80,18 +93,52 @@ class ServoController:
         w1 = ord(self.sc.read())
         w2 = ord(self.sc.read())
         pos = int(w1<<7) + int(w2)
-        return w1, w2
+        return pos
 
     def getErrors(self):
         data =  chr(0xaa) + chr(0x0c) + chr(0x21)
         self.sc.write(data)
         w1 = ord(self.sc.read())
         w2 = ord(self.sc.read())
-        return w1, w2
+        error_code = int(w1<<7) + int(w2)
+        return error_code
 
     def triggerScript(self, subNumber):
-        data =  chr(0xaa) + chr(0x0c) + chr(0x27) + chr(subNumber)
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x27) + chr(subNumber)
+        else:
+            data = chr(0xa7) + chr(subNumber)
         self.sc.write(data)
+
+    def triggerScript_params(self,subNumber,parameter):
+        param_lo = parameter & 0x7f
+        param_hi = (parameter >> 7) & 0x7f
+
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x28) + chr(subNumber) + chr(param_lo) + chr(param_hi)
+        else:
+            data = chr(0xa8) + chr(subNumber) + chr(param_lo) + chr(param_hi)
+
+        self.sc.write(data)
+        
+    def stopScript(self):
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x24)
+        else:
+            data = chr(0xA4) 
+        self.sc.write(data)
+
+    def getScriptStatus(self):
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x2e)
+        else:
+            data = chr(0xae) 
+        self.sc.write(data)
+        if ord(self.sc.read()) == 1:
+            return True #script is running
+        else:
+            return False #no scripts running
+
 
 servo1=ServoController("/dev/ttyACM0")
 
@@ -99,12 +146,17 @@ servo1=ServoController("/dev/ttyACM0")
 #servo1.setAngle(0,0)
 #servo1.setAngle(1,0)
 
+#Acceleration setting
+# servo1.setAcceleration(0,10)
+# servo1.setAcceleration(1,1)
+
 #set Position works in 1/4th the position wanted. So, if 800 is req position, send 200
 #Range : - 1000-2000
-servo1.setTarget(0,2000) 
-servo1.setTarget(1,2000)
+# servo1.setTarget(0,2000) 
+# servo1.setTarget(1,1000)
 
 #Returns a number
+#print servo1.get_movingState()
 #print servo1.getPosition(0)
 #print servo1.getErrors()
 servo1.closeServo()
