@@ -21,8 +21,8 @@ class ServoController:
         bud=chr(0xFF)+chr(n)+chr(byteone)
         self.sc.write(bud)
 
+        #Range of position is from 4000 - 8000
     def setTarget(self, servo, position):
-        position = position * 4
         poslo = (position & 0x7f)
         poshi = (position >> 7) & 0x7f
         chan  = servo &0x7f
@@ -72,7 +72,7 @@ class ServoController:
         self.sc.write(data)
 
 
-    def get_movingState(self):
+    def getMovingState(self):
         if self.protocol=="pololu":
             data =  chr(0xaa) + chr(0x0c) + chr(0x13)
         else:
@@ -90,15 +90,15 @@ class ServoController:
         self.sc.write(data)
         w1 = ord(self.sc.read())
         w2 = ord(self.sc.read())
-        pos = int(w1<<7) + int(w2)
-        return pos
+        pos = int(w2<<8) + int(w1)
+        return pos 
 
     def getErrors(self):
         data =  chr(0xaa) + chr(0x0c) + chr(0x21)
         self.sc.write(data)
         w1 = ord(self.sc.read())
         w2 = ord(self.sc.read())
-        error_code = int(w1<<7) + int(w2)
+        error_code = int(w2<<8) + int(w1)
         return error_code
 
     def triggerScript(self, subNumber):
