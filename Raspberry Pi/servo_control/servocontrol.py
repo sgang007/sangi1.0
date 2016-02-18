@@ -1,5 +1,3 @@
-import webiopi
-#from webiopi.devices.serial import Serial
 from serial import Serial
 import time
 
@@ -140,23 +138,3 @@ class ServoController:
             return False #no scripts running
 
 
-servo1=ServoController("/dev/ttyACM0")
-
-#Send Servo Angle in degrees (0-180)
-#servo1.setAngle(0,0)
-#servo1.setAngle(1,0)
-
-#Acceleration setting
-# servo1.setAcceleration(0,10)
-# servo1.setAcceleration(1,1)
-
-#set Position works in 1/4th the position wanted. So, if 800 is req position, send 200
-#Range : - 1000-2000
-# servo1.setTarget(0,2000) 
-# servo1.setTarget(1,1000)
-
-#Returns a number
-#print servo1.get_movingState()
-#print servo1.getPosition(0)
-#print servo1.getErrors()
-servo1.closeServo()
