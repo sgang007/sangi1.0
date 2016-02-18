@@ -36,13 +36,27 @@ class ServoController:
         self.sc.write(data)
 
     
-    
+    def setSpeed(self,servo,speed):
+        #speed is accepted in microseconds/milliseconds. See pg 42 of documentation
+        speed = speed/0.025
+        speed_low = (speed & 0x7f)
+        speed_high = (speed >> 7)& 0x7f
+        chan = servo & 0x7f
+
+        if self.protocol=="pololu":
+            data =  chr(0xaa) + chr(0x0c) + chr(0x07) + chr(chan) + chr(speed_low) + chr(speed_high)
+        else:
+            data = chr(0x87) + chr(chan) + chr(speed_low) + chr(speed_high)
+        self.sc.write(data)
+
+
     def getPosition(self, servo):
         chan  = servo &0x7f
         data =  chr(0xaa) + chr(0x0c) + chr(0x10) + chr(chan)
         self.sc.write(data)
         w1 = ord(self.sc.read())
         w2 = ord(self.sc.read())
+        pos = int(w1<<7) + int(w2)
         return w1, w2
 
     def getErrors(self):
