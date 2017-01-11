@@ -8,9 +8,9 @@
 
 //Left Motor Pin Definitions
 
-#define ENDIAG1     1 
-#define InA1        8
-#define InB1        7
+#define ENDIAG1     6
+#define InA1        7
+#define InB1        8
 #define PWM1        9
 #define CS1         A0
 #define encA1       5
@@ -18,8 +18,8 @@
 
 //Right Motor Pin Definitions
 
-#define ENDIAG2     6
-#define InA2        11
+#define ENDIAG2     11
+#define InA2        13  
 #define InB2        12
 #define PWM2        10
 #define CS2         A1
@@ -56,7 +56,9 @@ void stopIfFault()
 void loop() {
   // put your main code here, to run repeatedly:
 
-      md.setSpeeds(200,10);
+      md.setSpeeds(10,10 );
+      //md.setM1Speed(50);
+      //md.setM2Speed(200);
   
   if (en1.read()>COUNTS_PER_REV|| en1.read()<-COUNTS_PER_REV)
   {

@@ -1,0 +1,3 @@
+[submodule "Arduino/dual-vnh5019-motor-shield"]
+	path = Arduino/dual-vnh5019-motor-shield
+	url = https://github.com/pololu/dual-vnh5019-motor-shield.git
