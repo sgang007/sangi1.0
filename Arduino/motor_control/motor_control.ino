@@ -1,4 +1,3 @@
-
 //#define ENCODER_OPTIMIZE_INTERRUPTS
 #include <Encoder.h>
 #include <DualVNH5019MotorShield.h>
@@ -26,6 +25,8 @@
 #define encA2       4
 #define encB2       2
 
+
+//TODO: Read all tuning parameters from EEPROM
 #define FVEL_STEP 10
 #define AVEL_STEP 1
 #define WHEEL_DIST 30
