@@ -2,8 +2,9 @@
 #include <Encoder.h>
 #include <DualVNH5019MotorShield.h>
 
-#define COUNTS_PER_REV 1200*2 
-//As per Pololu website 1200 ticks is to one revolution of motor shaft but experiments shows 2400
+//#define COUNTS_PER_REV 1200*2 
+#define COUNTS_PER_REV 3200
+
 
 //Left Motor Pin Definitions
 
@@ -64,10 +65,23 @@ void stopIfFault()
   }
 }
 
+int motor1(float v, float w)
+{
+  return int(3.1776*(v + 6*w));
+}
+
+int motor2(float v, float w)
+{
+  return int(3.1776*(v+6*w));
+}
+
+
+
 void loop() {
   // put your main code here, to run repeatedly:
 
   stopIfFault();
+  
   // Read encoder1 outputs and display on screen    
   
   if (en1.read()>COUNTS_PER_REV|| en1.read()<-COUNTS_PER_REV)
@@ -139,10 +153,7 @@ void loop() {
       
       
       }
-      speed1 = (2*forward_vel + angular_vel * WHEEL_DIST) /2;
-      speed2 = (2*forward_vel - angular_vel * WHEEL_DIST) /2 ;
-
-      md.setSpeeds(SPEED_FACTOR*speed1,SPEED_FACTOR*speed2);
+      md.setSpeeds( motor1(forward_vel,angular_vel) , motor2(forward_vel,angular_vel) );
       
     }
     
