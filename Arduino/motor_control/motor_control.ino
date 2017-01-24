@@ -1,5 +1,6 @@
 //#define ENCODER_OPTIMIZE_INTERRUPTS
 #include <Encoder.h>
+#include <EEPROM.h>
 #include <DualVNH5019MotorShield.h>
 
 //#define COUNTS_PER_REV 1200*2 
@@ -40,6 +41,41 @@ Encoder en2(encA2,encB2);
 int enc1_rpm,enc2_rpm;
 int speed1,speed2,forward_vel,angular_vel;
 char c;
+
+struct design_params{
+    float wheel_dist;
+    float speed_factor;
+};
+
+struct control_params{
+    float Kp;
+    float Kd;
+    float Ki;
+};
+
+void writeParams(int * params)
+{  
+    //load parameters into an object of design_params
+    design_params design_data;
+    control_params control_data;
+    int eeAddress =0;
+    EEPROM.put(eeAddress, design_data);
+    eeAddress += sizeof(design_params);
+    EEPROM.put(eeAddress, control_data);
+        
+}
+
+void loadParams(float * params)
+{
+    int eeAddress =0;
+    design_params design_data;
+    control_params control_data;
+    EEPROM.get(eeAddress, design_data);
+    eeAddress += sizeof(design_params);
+    EEPROM.get(eeAddress, control_data);
+    
+    //Combine design_data and control_data into parameters and return
+}
 
 void setup() {
     md.init();
