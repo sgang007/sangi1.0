@@ -83,6 +83,13 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Motor Driver and Encoder Test \n --------------------------");
     speed1=speed2=forward_vel=angular_vel=0;
+    
+    TCCR2B = 0x00;        //Disbale Timer2 while we set it up
+    TCNT2  = 130;         //Reset Timer Count to 130 out of 255
+    TIFR2  = 0x00;        //Timer2 INT Flag Reg: Clear Timer Overflow Flag
+    TIMSK2 = 0x01;        //Timer2 INT Reg: Timer2 Overflow Interrupt Enable
+    TCCR2A = 0x00;        //Timer2 Control Reg A: Wave Gen Mode normal
+    TCCR2B = 0x05;        //Timer2 Control Reg B: Timer Prescaler set to 128
 
 }
 void stopIfFault()
@@ -111,6 +118,14 @@ int motor2(float v, float w)
   return int(3.1776*(v+6*w));
 }
 
+
+
+ISR(TIMER2_OVF_vect){
+    enc1_rpm = en1.read();
+    enc2_rpm = en2.read();
+    TCNT2 = 130; //resetting timer2
+    TIFR2 = 0x00;
+}
 
 
 void loop() {
