@@ -33,6 +33,7 @@
 #define FVEL_STEP 10
 #define AVEL_STEP 1
 #define WHEEL_DIST 30
+#define WHEEL_DIA 12
 #define MAX_SPEED 100
 #define SPEED_FACTOR 400/MAX_SPEED
 #define ENCODER_POLL 10              //updates the Encoder RPM count 10 times per second
@@ -45,7 +46,7 @@ Encoder en1(encA1,encB1);
 Encoder en2(encA2,encB2);
 
 float enc1_rpm,enc2_rpm;
-int current_fvel,current_avel,forward_vel,angular_vel;
+float current_fvel,current_avel,forward_vel,angular_vel;
 char c;
 
 struct design_params{
@@ -196,6 +197,15 @@ void teleoperateFromSerial()
 
 void printRobotState()
 {
+  float speed1, speed2;
+  speed1 = -(enc1_rpm * WHEEL_DIA * PI ) / 60.0;
+  speed2 = (enc2_rpm * WHEEL_DIA * PI ) / 60.0;
+  
+  current_fvel = (speed1 + speed2) / 2.0 ;
+  current_avel = (speed1 - speed2) / WHEEL_DIST;
+  Serial.print(current_fvel);
+  Serial.print(":");
+  Serial.println(current_avel);
   
 }
 
@@ -204,7 +214,8 @@ void loop() {
 
   stopIfFault();    
   
-  printMotorRPMs();
+  //printMotorRPMs();
+  printRobotState();
   
   teleoperateFromSerial();
    
