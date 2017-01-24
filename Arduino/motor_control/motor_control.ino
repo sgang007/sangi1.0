@@ -44,8 +44,8 @@ DualVNH5019MotorShield md(InA1,InB1,ENDIAG1,CS1,InA2,InB2,ENDIAG2,CS2);
 Encoder en1(encA1,encB1);
 Encoder en2(encA2,encB2);
 
-int enc1_rpm,enc2_rpm;
-int speed1,speed2,forward_vel,angular_vel;
+float enc1_rpm,enc2_rpm;
+int current_fvel,current_avel,forward_vel,angular_vel;
 char c;
 
 struct design_params{
@@ -84,11 +84,14 @@ void loadParams(float * params)
 }
 
 void setup() {
+  
     md.init();
   
     Serial.begin(115200);
     Serial.println("Motor Driver and Encoder Test \n --------------------------");
-    speed1=speed2=forward_vel=angular_vel=0;
+    
+    current_fvel=current_avel=forward_vel=angular_vel=0;
+    
     FlexiTimer2::set(POLL_RESOLUTION/ENCODER_POLL, 1.0/POLL_RESOLUTION, updateRPM);
     FlexiTimer2::start();
 
@@ -98,8 +101,8 @@ void setup() {
 void updateRPM()
 {
   //update RPMs
-  enc1_rpm = (en1.read() * 60 * ENCODER_POLL) / COUNTS_PER_REV;
-  enc2_rpm = (en2.read() * 60 * ENCODER_POLL) / COUNTS_PER_REV;
+  enc1_rpm = float((en1.read() * 60 * ENCODER_POLL)) / COUNTS_PER_REV;
+  enc2_rpm = float((en2.read() * 60 * ENCODER_POLL)) / COUNTS_PER_REV;
 
   //reset encoder counts
   en1.write(0);
@@ -135,24 +138,20 @@ int motor2(float v, float w)
 
 
 
-
-void loop() {
-  // put your main code here, to run repeatedly:
-
-  stopIfFault();
-  
-  // Read encoder1 outputs and display on screen    
-  
+void printMotorRPMs()
+{
   Serial.print("Motor 1 (RPM):");
   Serial.print(enc1_rpm);
   Serial.print("\t\t\t");
   Serial.print("Motor 2 (RPM):");
   Serial.print(enc2_rpm);
-  Serial.println();
-  
-  
-//================================================================================
- //Check for Serial Input to control the robot
+  Serial.println();  
+}
+
+
+void teleoperateFromSerial()
+{
+  //Check for Serial Input to control the robot
   if(Serial.available()){
     c = Serial.read();
     switch(c)
@@ -191,7 +190,24 @@ void loop() {
       md.setSpeeds( motor1(forward_vel,angular_vel) , motor2(forward_vel,angular_vel) );
       
     }
-    
+  
+}
+
+
+void printRobotState()
+{
+  
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+  stopIfFault();    
+  
+  printMotorRPMs();
+  
+  teleoperateFromSerial();
+   
 }
   
 
