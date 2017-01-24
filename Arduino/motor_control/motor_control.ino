@@ -1,6 +1,7 @@
 //#define ENCODER_OPTIMIZE_INTERRUPTS
 #include <Encoder.h>
 #include <EEPROM.h>
+#include <FlexiTimer2.h>
 #include <DualVNH5019MotorShield.h>
 
 //#define COUNTS_PER_REV 1200*2 
@@ -34,10 +35,15 @@
 #define WHEEL_DIST 30
 #define MAX_SPEED 100
 #define SPEED_FACTOR 400/MAX_SPEED
+#define ENCODER_POLL 10              //updates the Encoder RPM count 10 times per second
+#define POLL_RESOLUTION 1000         //accuracy is 1/1000 of a second
+
+
 
 DualVNH5019MotorShield md(InA1,InB1,ENDIAG1,CS1,InA2,InB2,ENDIAG2,CS2);
 Encoder en1(encA1,encB1);
 Encoder en2(encA2,encB2);
+
 int enc1_rpm,enc2_rpm;
 int speed1,speed2,forward_vel,angular_vel;
 char c;
@@ -83,15 +89,24 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Motor Driver and Encoder Test \n --------------------------");
     speed1=speed2=forward_vel=angular_vel=0;
-    
-    TCCR2B = 0x00;        //Disbale Timer2 while we set it up
-    TCNT2  = 130;         //Reset Timer Count to 130 out of 255
-    TIFR2  = 0x00;        //Timer2 INT Flag Reg: Clear Timer Overflow Flag
-    TIMSK2 = 0x01;        //Timer2 INT Reg: Timer2 Overflow Interrupt Enable
-    TCCR2A = 0x00;        //Timer2 Control Reg A: Wave Gen Mode normal
-    TCCR2B = 0x05;        //Timer2 Control Reg B: Timer Prescaler set to 128
+    FlexiTimer2::set(POLL_RESOLUTION/ENCODER_POLL, 1.0/POLL_RESOLUTION, updateRPM);
+    FlexiTimer2::start();
 
 }
+
+
+void updateRPM()
+{
+  //update RPMs
+  enc1_rpm = (en1.read() * 60 * ENCODER_POLL) / COUNTS_PER_REV;
+  enc2_rpm = (en2.read() * 60 * ENCODER_POLL) / COUNTS_PER_REV;
+
+  //reset encoder counts
+  en1.write(0);
+  en2.write(0);
+}
+
+
 void stopIfFault()
 {
   if (md.getM1Fault())
@@ -120,13 +135,6 @@ int motor2(float v, float w)
 
 
 
-ISR(TIMER2_OVF_vect){
-    enc1_rpm = en1.read();
-    enc2_rpm = en2.read();
-    TCNT2 = 130; //resetting timer2
-    TIFR2 = 0x00;
-}
-
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -135,38 +143,14 @@ void loop() {
   
   // Read encoder1 outputs and display on screen    
   
-  if (en1.read()>COUNTS_PER_REV|| en1.read()<-COUNTS_PER_REV)
-  {
-    //1 Revoultion complete
-    enc1_rpm++;
-    
-    if (en1.read()<0)
-    Serial.print(-enc1_rpm);
-    else
-    Serial.print(enc1_rpm);
-    
-    en1.write(0);
-    
-    Serial.print("\t");
-  }
+  Serial.print("Motor 1 (RPM):");
+  Serial.print(enc1_rpm);
+  Serial.print("\t\t\t");
+  Serial.print("Motor 2 (RPM):");
+  Serial.print(enc2_rpm);
+  Serial.println();
   
-  //Read encoder 2 outputs and display on screen
   
-  if (en2.read()>COUNTS_PER_REV|| en2.read()<-COUNTS_PER_REV)
-  {
-    
-    enc2_rpm++;
-    
-    if (en2.read()<0)
-    Serial.print(enc2_rpm);
-    else
-    Serial.print(-enc1_rpm);
-    
-    en2.write(0);
-    Serial.println();
-    
-  }  
-
 //================================================================================
  //Check for Serial Input to control the robot
   if(Serial.available()){
