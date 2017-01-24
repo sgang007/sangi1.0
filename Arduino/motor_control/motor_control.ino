@@ -134,7 +134,7 @@ int motor1(float v, float w)
 
 int motor2(float v, float w)
 {
-  return int(3.1776*(v+6*w));
+  return int(3.1776*(v - 6*w));
 }
 
 
@@ -198,7 +198,8 @@ void teleoperateFromSerial()
 void printRobotState()
 {
   float speed1, speed2;
-  speed1 = -(enc1_rpm * WHEEL_DIA * PI ) / 60.0;
+  
+  speed1 = -(enc1_rpm * WHEEL_DIA * PI ) / 60.0; 
   speed2 = (enc2_rpm * WHEEL_DIA * PI ) / 60.0;
   
   current_fvel = (speed1 + speed2) / 2.0 ;
