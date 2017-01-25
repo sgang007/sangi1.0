@@ -61,6 +61,9 @@ struct control_params{
     float Ki;
 };
 
+
+
+
 void writeParams(int * params)
 {  
     //load parameters into an object of design_params
@@ -189,7 +192,7 @@ void teleoperateFromSerial()
       
       
       }
-      md.setSpeeds( motor1(forward_vel,angular_vel) , motor2(forward_vel,angular_vel) );
+      
       
     }
   
@@ -199,31 +202,21 @@ void teleoperateFromSerial()
 void getRobotState()
 {
     char input[INPUT_SIZE + 1];
+    //while(!Serial.available());
     byte size = Serial.readBytes(input, INPUT_SIZE);
     // Add the final 0 to end the C string
     input[size] = 0;
     
-    // Read each command pair 
-    char* command = strtok(input, "&");
-    while (command != 0)
-    {
-        // Split the command in two values
-        char* separator = strchr(command, ':');
-        if (separator != 0)
-        {
-            // Actually split the string in 2: replace ':' with 0
-            *separator = 0;
-            int servoId = atoi(command);
-            ++separator;
-            int position = atoi(separator);
+    // Read each command pair
+    const char * delim = ":"; 
+    char* data;
+    data = strtok(input, delim);
+    forward_vel = atof(data);
     
-            // Do something with servoId and position
-        }
-        // Find the next command in input string
-        command = strtok(0, "&");
-    }
-    
+    data = strtok(NULL, delim);
+    angular_vel = atof(data); 
 }
+
 
 void printRobotState()
 {
@@ -240,6 +233,11 @@ void printRobotState()
   
 }
 
+void setRobotState()
+{
+  md.setSpeeds( motor1(forward_vel,angular_vel) , motor2(forward_vel,angular_vel) );
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
 
@@ -248,7 +246,11 @@ void loop() {
   //printMotorRPMs();
   printRobotState();
   
-  teleoperateFromSerial();
+  //teleoperateFromSerial();
+  getRobotState();
+
+  setRobotState();
+  
    
 }
   
