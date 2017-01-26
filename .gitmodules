@@ -4,3 +4,6 @@
 [submodule "Arduino/FlexiTimer2"]
 	path = Arduino/FlexiTimer2
 	url = https://github.com/PaulStoffregen/FlexiTimer2
+[submodule "Arduino/Arduino-PID-Library"]
+	path = Arduino/Arduino-PID-Library
+	url = https://github.com/br3ttb/Arduino-PID-Library/

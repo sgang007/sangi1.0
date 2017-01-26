@@ -1,6 +1,7 @@
 //#define ENCODER_OPTIMIZE_INTERRUPTS
 #include <Encoder.h>
 #include <EEPROM.h>
+#include <PID_v1.h>
 #include <FlexiTimer2.h>
 #include <DualVNH5019MotorShield.h>
 
