@@ -40,10 +40,10 @@
 #define SPEED_FACTOR 400/MAX_SPEED
 #define ENCODER_POLL 10              //updates the Encoder RPM count 10 times per second
 #define POLL_RESOLUTION 1000         //accuracy is 1/1000 of a second
-#define V_KP 1.2
+#define V_KP 1.0
 #define V_KD 0.0
 #define V_KI 0.0
-#define A_KP 1.2
+#define A_KP 1.0
 #define A_KD 0.0
 #define A_KI 0.0
 
@@ -67,8 +67,8 @@ struct control_params{
 DualVNH5019MotorShield md(InA1,InB1,ENDIAG1,CS1,InA2,InB2,ENDIAG2,CS2);
 Encoder en1(encA1,encB1);
 Encoder en2(encA2,encB2);
-PID control_fvel(&current_fvel, &target_fvel, &forward_vel, double(fvel.Kp), double(fvel.Ki), double(fvel.Kd), AUTOMATIC);
-PID control_avel(&current_avel, &target_avel, &angular_vel, double(avel.Kp), double(avel.Ki), double(avel.Kd), AUTOMATIC);
+PID control_fvel(&current_fvel, &target_fvel, &forward_vel, double(fvel.Kp), double(fvel.Ki), double(fvel.Kd), DIRECT);
+PID control_avel(&current_avel, &target_avel, &angular_vel, double(avel.Kp), double(avel.Ki), double(avel.Kd), DIRECT);
 
 
 
@@ -281,9 +281,9 @@ void loop() {
   teleoperateFromSerial();
   //getRobotState();
   Serial.print("Target:  ");
-  Serial.print(forward_vel);
+  Serial.print(target_fvel);
   Serial.print(":");
-  Serial.println(angular_vel);
+  Serial.println(target_avel);
 
   control_fvel.Compute();
   control_avel.Compute();
