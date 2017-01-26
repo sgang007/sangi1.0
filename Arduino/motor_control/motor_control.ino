@@ -48,7 +48,6 @@ Encoder en2(encA2,encB2);
 
 float enc1_rpm,enc2_rpm;
 float current_fvel,current_avel,forward_vel,angular_vel;
-char c;
 
 struct design_params{
     float wheel_dist;
@@ -64,7 +63,7 @@ struct control_params{
 
 
 
-void writeParams(int * params)
+void writeParams()
 {  
     //load parameters into an object of design_params
     design_params design_data;
@@ -76,7 +75,7 @@ void writeParams(int * params)
         
 }
 
-void loadParams(float * params)
+void loadParams()
 {
     int eeAddress =0;
     design_params design_data;
@@ -156,6 +155,7 @@ void printMotorRPMs()
 
 void teleoperateFromSerial()
 {
+  char c;
   //Check for Serial Input to control the robot
   if(Serial.available()){
     c = Serial.read();
@@ -208,7 +208,7 @@ void getRobotState()
     input[size] = 0;
     
     // Read each command pair
-    const char * delim = ":"; 
+    const char * delim = ","; 
     char* data;
     data = strtok(input, delim);
     forward_vel = atof(data);
@@ -218,7 +218,7 @@ void getRobotState()
 }
 
 
-void printRobotState()
+void updateRobotState()
 {
   float speed1, speed2;
   
@@ -227,9 +227,6 @@ void printRobotState()
   
   current_fvel = (speed1 + speed2) / 2.0 ;
   current_avel = (speed1 - speed2) / WHEEL_DIST;
-  Serial.print(current_fvel);
-  Serial.print(":");
-  Serial.println(current_avel);
   
 }
 
@@ -244,11 +241,21 @@ void loop() {
   stopIfFault();    
   
   //printMotorRPMs();
-  printRobotState();
+  updateRobotState();
+  Serial.print("Current:  ");
+  Serial.print(current_fvel);
+  Serial.print(",");
+  Serial.print(current_avel);
+  Serial.print("\t\t\t");
   
-  //teleoperateFromSerial();
-  getRobotState();
-
+  
+  teleoperateFromSerial();
+  //getRobotState();
+  Serial.print("Target:  ");
+  Serial.print(forward_vel);
+  Serial.print(":");
+  Serial.println(angular_vel);
+  
   setRobotState();
   
    
