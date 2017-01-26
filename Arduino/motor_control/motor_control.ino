@@ -34,21 +34,23 @@
 #define INPUT_SIZE 30
 #define FVEL_STEP 10
 #define AVEL_STEP 1
-#define WHEEL_DIST 30
+#define WHEEL_DIST 30.0
 #define WHEEL_DIA 12
-#define MAX_SPEED 100
+#define MAX_SPEED 120.0
 #define SPEED_FACTOR 400/MAX_SPEED
 #define ENCODER_POLL 10              //updates the Encoder RPM count 10 times per second
 #define POLL_RESOLUTION 1000         //accuracy is 1/1000 of a second
+#define V_KP 1.2
+#define V_KD 0.0
+#define V_KI 0.0
+#define A_KP 1.2
+#define A_KD 0.0
+#define A_KI 0.0
 
 
-
-DualVNH5019MotorShield md(InA1,InB1,ENDIAG1,CS1,InA2,InB2,ENDIAG2,CS2);
-Encoder en1(encA1,encB1);
-Encoder en2(encA2,encB2);
 
 float enc1_rpm,enc2_rpm;
-float current_fvel,current_avel,forward_vel,angular_vel;
+double current_fvel,current_avel,forward_vel,angular_vel,target_fvel,target_avel;
 
 struct design_params{
     float wheel_dist;
@@ -59,8 +61,14 @@ struct control_params{
     float Kp;
     float Kd;
     float Ki;
-};
+}fvel,avel;
 
+
+DualVNH5019MotorShield md(InA1,InB1,ENDIAG1,CS1,InA2,InB2,ENDIAG2,CS2);
+Encoder en1(encA1,encB1);
+Encoder en2(encA2,encB2);
+PID control_fvel(&current_fvel, &target_fvel, &forward_vel, double(fvel.Kp), double(fvel.Ki), double(fvel.Kd), AUTOMATIC);
+PID control_avel(&current_avel, &target_avel, &angular_vel, double(avel.Kp), double(avel.Ki), double(avel.Kd), AUTOMATIC);
 
 
 
@@ -86,6 +94,8 @@ void loadParams()
     EEPROM.get(eeAddress, control_data);
     
     //Combine design_data and control_data into parameters and return
+    
+    
 }
 
 void setup() {
@@ -95,7 +105,24 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Motor Driver and Encoder Test \n --------------------------");
     
-    current_fvel=current_avel=forward_vel=angular_vel=0;
+    current_fvel=current_avel=forward_vel=angular_vel=target_fvel=target_avel=0.0;
+
+    //loadParams();
+
+    fvel.Kp = V_KP;
+    fvel.Kd = V_KD;
+    fvel.Ki = V_KI;
+    avel.Kp = A_KP;
+    avel.Kd = A_KD;
+    avel.Ki = A_KI;
+    
+    control_fvel.SetTunings(double(fvel.Kp), double(fvel.Kd), double(fvel.Ki));
+    control_fvel.SetOutputLimits(-MAX_SPEED, MAX_SPEED);
+    control_fvel.SetMode(AUTOMATIC);
+    
+    control_avel.SetTunings(double(avel.Kp), double(avel.Kd), double(avel.Ki));
+    control_avel.SetOutputLimits(-(2*MAX_SPEED)/WHEEL_DIST, (2*MAX_SPEED)/WHEEL_DIST);
+    control_avel.SetMode(AUTOMATIC); 
     
     FlexiTimer2::set(POLL_RESOLUTION/ENCODER_POLL, 1.0/POLL_RESOLUTION, updateRPM);
     FlexiTimer2::start();
@@ -233,7 +260,8 @@ void updateRobotState()
 
 void setRobotState()
 {
-  md.setSpeeds( motor1(forward_vel,angular_vel) , motor2(forward_vel,angular_vel) );
+  //md.setSpeeds( motor1(forward_vel,angular_vel) , motor2(forward_vel,angular_vel) );
+  md.setSpeeds( motor1(target_fvel, target_avel), motor2(target_fvel, target_avel) );
 }
 
 void loop() {
@@ -256,6 +284,9 @@ void loop() {
   Serial.print(forward_vel);
   Serial.print(":");
   Serial.println(angular_vel);
+
+  control_fvel.Compute();
+  control_avel.Compute();
   
   setRobotState();
   
