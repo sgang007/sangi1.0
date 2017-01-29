@@ -2,6 +2,7 @@
 #include <Encoder.h>
 #include <EEPROM.h>
 #include <PID_v1.h>
+#include <PID_AutoTune_v0.h>
 #include <FlexiTimer2.h>
 #include <DualVNH5019MotorShield.h>
 
@@ -51,11 +52,12 @@
 
 float enc1_rpm,enc2_rpm;
 double current_fvel,current_avel,forward_vel,angular_vel,target_fvel,target_avel;
+boolean fvel_tuning, avel_tuning;
 
-struct design_params{
-    float wheel_dist;
-    float speed_factor;
-};
+//struct design_params{
+//    float wheel_dist;
+//    float speed_factor;
+//};
 
 struct control_params{
     float Kp;
@@ -69,12 +71,17 @@ Encoder en1(encA1,encB1);
 Encoder en2(encA2,encB2);
 PID control_fvel(&current_fvel, &target_fvel, &forward_vel, double(fvel.Kp), double(fvel.Ki), double(fvel.Kd), DIRECT);
 PID control_avel(&current_avel, &target_avel, &angular_vel, double(avel.Kp), double(avel.Ki), double(avel.Kd), DIRECT);
-
+PID_ATune aTune_fvel(&current_fvel, &target_fvel);
+PID_ATune aTune_avel(&current_avel, &target_avel);
 
 
 void writeParams()
 {  
     //load parameters into an object of design_params
+    struct design_params{
+      float wheel_dist;
+      float speed_factor;
+    };
     design_params design_data;
     control_params control_data;
     int eeAddress =0;
@@ -87,6 +94,10 @@ void writeParams()
 void loadParams()
 {
     int eeAddress =0;
+    struct design_params{
+      float wheel_dist;
+      float speed_factor;
+    };
     design_params design_data;
     control_params control_data;
     EEPROM.get(eeAddress, design_data);
@@ -215,8 +226,14 @@ void teleoperateFromSerial()
          forward_vel=0;
          break;
       }
+      case 'T':
+      {
+        fvel_tuning= true;
+        avel_tuning=true;
+        break;
+      }
       default:
-      Serial.println("Invalid Input. Press w/a/s/d");
+      Serial.println("Invalid Input. Press w/a/s/d/T/ :");
       
       
       }
@@ -264,6 +281,9 @@ void setRobotState()
   md.setSpeeds( motor1(target_fvel, target_avel), motor2(target_fvel, target_avel) );
 }
 
+
+
+
 void loop() {
   // put your main code here, to run repeatedly:
 
@@ -285,9 +305,48 @@ void loop() {
   Serial.print(":");
   Serial.println(target_avel);
 
-  control_fvel.Compute();
-  control_avel.Compute();
+  if(fvel_tuning)
+  {
+    if (aTune_fvel.Runtime()!=0)
+    {
+      fvel_tuning = false;
+    }
+    if(!fvel_tuning)
+    { //we're done, set the tuning parameters
+      fvel.Kp = aTune_fvel.GetKp();
+      fvel.Ki = aTune_fvel.GetKi();
+      fvel.Kd = aTune_fvel.GetKd();
+      control_fvel.SetTunings(fvel.Kp,fvel.Ki,fvel.Kd);
+      control_fvel.SetMode(AUTOMATIC);
+    }
+  }
+    else  
+    {
+      control_fvel.Compute();      
+    }
   
+  
+  if(avel_tuning)
+  {
+    
+    if (aTune_avel.Runtime()!=0)
+    {
+      avel_tuning = false;
+    }
+    if(!avel_tuning)
+    { //we're done, set the tuning parameters
+      avel.Kp = aTune_avel.GetKp();
+      avel.Ki = aTune_avel.GetKi();
+      avel.Kd = aTune_avel.GetKd();
+      control_avel.SetTunings(avel.Kp,avel.Ki,avel.Kd);
+      control_avel.SetMode(AUTOMATIC);
+    }
+  }
+    else  
+    {
+      control_avel.Compute();      
+    }
+   
   setRobotState();
   
    
