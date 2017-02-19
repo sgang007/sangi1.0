@@ -13,6 +13,7 @@
 
 float scan[MAX_RANGE/FORWARD_STEP]; //array storing obstacle probability for discrete disctance elements with each step
 const int pingPin = 7;
+const int dist = 2;
 
 void printFloat(float value, int places) {
   // this is used to cast digits 
@@ -99,6 +100,7 @@ float get_distance()
   float d,x;
   //sending pulse
   pinMode(pingPin, OUTPUT);
+  pinMode(dist,INPUT);
   digitalWrite(pingPin, LOW);
   delayMicroseconds(10);
   digitalWrite(pingPin, HIGH);
@@ -106,8 +108,8 @@ float get_distance()
   digitalWrite(pingPin, LOW);
   delayMicroseconds(10);
   //read pulse width from echo
-  pinMode(pingPin, INPUT);
-  duration = pulseIn(pingPin, HIGH); 
+  pinMode(dist, INPUT);
+  duration = pulseIn(dist, HIGH); 
   x = microsecondsToCentimeters(duration); //convert echo time to distance
   
   //calculated approximate distance in centimetres
@@ -147,12 +149,15 @@ void fill_scan(){
     Serial.print("],");
   }
 }
+float dis;
 void loop()
 {
   
-  fill_scan();
+  //fill_scan();
+  printFloat(get_distance(),3);
+  Serial.println();
   //write next part of the code here
-  while(1);
+  //while(1);
   //remove this infinite while loop to keep running the code
   
   

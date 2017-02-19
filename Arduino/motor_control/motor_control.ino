@@ -2,7 +2,7 @@
 #include <Encoder.h>
 #include <EEPROM.h>
 #include <PID_v1.h>
-#include <PID_AutoTune_v0.h>
+//#include <PID_AutoTune_v0.h>
 #include <FlexiTimer2.h>
 #include <DualVNH5019MotorShield.h>
 
@@ -71,8 +71,8 @@ Encoder en1(encA1,encB1);
 Encoder en2(encA2,encB2);
 PID control_fvel(&current_fvel, &target_fvel, &forward_vel, double(fvel.Kp), double(fvel.Ki), double(fvel.Kd), DIRECT);
 PID control_avel(&current_avel, &target_avel, &angular_vel, double(avel.Kp), double(avel.Ki), double(avel.Kd), DIRECT);
-PID_ATune aTune_fvel(&current_fvel, &target_fvel);
-PID_ATune aTune_avel(&current_avel, &target_avel);
+//PID_ATune aTune_fvel(&current_fvel, &target_fvel);
+//PID_ATune aTune_avel(&current_avel, &target_avel);
 
 
 void writeParams()
@@ -305,47 +305,47 @@ void loop() {
   Serial.print(":");
   Serial.println(target_avel);
 
-  if(fvel_tuning)
-  {
-    if (aTune_fvel.Runtime()!=0)
-    {
-      fvel_tuning = false;
-    }
-    if(!fvel_tuning)
-    { //we're done, set the tuning parameters
-      fvel.Kp = aTune_fvel.GetKp();
-      fvel.Ki = aTune_fvel.GetKi();
-      fvel.Kd = aTune_fvel.GetKd();
-      control_fvel.SetTunings(fvel.Kp,fvel.Ki,fvel.Kd);
-      control_fvel.SetMode(AUTOMATIC);
-    }
-  }
-    else  
-    {
+//  if(fvel_tuning)
+//  {
+//    if (aTune_fvel.Runtime()!=0)
+//    {
+//      fvel_tuning = false;
+//    }
+//    if(!fvel_tuning)
+//    { //we're done, set the tuning parameters
+//      fvel.Kp = aTune_fvel.GetKp();
+//      fvel.Ki = aTune_fvel.GetKi();
+//      fvel.Kd = aTune_fvel.GetKd();
+//      control_fvel.SetTunings(fvel.Kp,fvel.Ki,fvel.Kd);
+//      control_fvel.SetMode(AUTOMATIC);
+//    }
+//  }
+//    else  
+//    {
       control_fvel.Compute();      
-    }
+//    }
   
   
-  if(avel_tuning)
-  {
-    
-    if (aTune_avel.Runtime()!=0)
-    {
-      avel_tuning = false;
-    }
-    if(!avel_tuning)
-    { //we're done, set the tuning parameters
-      avel.Kp = aTune_avel.GetKp();
-      avel.Ki = aTune_avel.GetKi();
-      avel.Kd = aTune_avel.GetKd();
-      control_avel.SetTunings(avel.Kp,avel.Ki,avel.Kd);
-      control_avel.SetMode(AUTOMATIC);
-    }
-  }
-    else  
-    {
+//  if(avel_tuning)
+//  {
+//    
+//    if (aTune_avel.Runtime()!=0)
+//    {
+//      avel_tuning = false;
+//    }
+//    if(!avel_tuning)
+//    { //we're done, set the tuning parameters
+//      avel.Kp = aTune_avel.GetKp();
+//      avel.Ki = aTune_avel.GetKi();
+//      avel.Kd = aTune_avel.GetKd();
+//      control_avel.SetTunings(avel.Kp,avel.Ki,avel.Kd);
+//      control_avel.SetMode(AUTOMATIC);
+//    }
+//  }
+//    else  
+//    {
       control_avel.Compute();      
-    }
+//    }
    
   setRobotState();
   
